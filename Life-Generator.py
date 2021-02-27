@@ -9,14 +9,35 @@
 import sys
 import GUI_App as gui
 import csv_manager as csv
+import Data_Query as data
 import multiprocessing
-import content_generator_microservice as cg    # update to content generator
+import content_generator_microservice as cg
+import random
 
+
+def life_generator_microservice(request, receive):
+    category_list = []
+    categories = data.get_toy_categories()
+    for cat in categories:
+        results = cat
+        results = results.replace(",", "")
+        results = results.replace("&", "")
+        results = results.split()[:2]
+        if len(results) == 1:
+            results.append(results[0])
+        category_list.append(results)
+
+    while True:
+        requested_results = request.get()
+        for i in range(requested_results):
+            num = random.randrange(1, len(category_list))
+            receive.put(category_list[num])
+    return
 
 def main():
     request_list = multiprocessing.Queue()
     receive_list = multiprocessing.Queue()
-    content_generator = multiprocessing.Process(target=cg.CG, args=(request_list, receive_list))      # needs fx name update!
+    content_generator = multiprocessing.Process(target=cg.CG, args=(request_list, receive_list))
     content_generator.start()
 
     try:
