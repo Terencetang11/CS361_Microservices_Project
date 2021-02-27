@@ -10,14 +10,14 @@ import sys
 import GUI_App as gui
 import csv_manager as csv
 import multiprocessing
-import test     # update to content generator
+import content_generator_microservice as cg    # update to content generator
 
 
 def main():
     request_list = multiprocessing.Queue()
     receive_list = multiprocessing.Queue()
-    p1 = multiprocessing.Process(target=test.test_send, args=(request_list, receive_list))      # needs fx name update!
-    p1.start()
+    content_generator = multiprocessing.Process(target=cg.CG, args=(request_list, receive_list))      # needs fx name update!
+    content_generator.start()
 
     try:
         # check if input csv file provided
@@ -27,9 +27,9 @@ def main():
     except IndexError:
         # if no input provided, launch GUI application
         root = gui.Tk()
-        app = gui.GUI(root, p1, request_list, receive_list)
+        app = gui.GUI(root, content_generator, request_list, receive_list)
         root.mainloop()
-        p1.terminate()
+        content_generator.terminate()
 
 
 if __name__ == "__main__":  main()                          # allows for normal run procedure if file ran as script.

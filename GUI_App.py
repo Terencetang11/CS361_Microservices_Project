@@ -99,9 +99,10 @@ class GUI:
             print(input_content)
             self.request_queue.put(input_content)
 
+            self.p1.join()  # blocks until content generator finishes writing content
+
             # receives input from content-generator microservice
             content = self.receive_queue.get()
-
 
             results = data.generate_results(input_cat, input_rows)
 
