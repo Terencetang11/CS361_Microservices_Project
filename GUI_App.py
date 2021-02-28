@@ -85,8 +85,6 @@ class GUI:
         self.cat_dropdown.focus()
         self.root.bind("<Return>", self.search)
 
-    def get_inputs(self):
-        return self.rows.get(), self.cat_input.get()
 
     def search(self, *args):
         try:
@@ -99,7 +97,7 @@ class GUI:
             print(input_content)
             self.request_queue.put(input_content)
 
-            self.p1.join()  # blocks until content generator finishes writing content
+            # self.p1.join()  # blocks until content generator finishes writing content
 
             # receives input from content-generator microservice
             content = self.receive_queue.get()
