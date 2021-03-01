@@ -50,7 +50,8 @@ def main():
         root = gui.Tk()
         app = gui.GUI(root, content_generator, request_list, receive_list)
         root.mainloop()
-        content_generator.terminate()
+
+    content_generator.terminate()
 
 
 if __name__ == "__main__":  main()                          # allows for normal run procedure if file ran as script.

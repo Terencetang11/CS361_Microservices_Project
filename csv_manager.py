@@ -14,6 +14,7 @@ def read_file_input(file):
         csv_reader = csv.reader(csv_data_file)
         headers = next(csv_reader)
 
+        toy_data = data.Data()
         results = []
         for row in csv_reader:                          # scans each row in CSV file
             if row[0] == 'toys':                        # checks if top level is toys input
@@ -21,7 +22,7 @@ def read_file_input(file):
                 input_rows = int(row[2])                # gets # of desired results
                 query = []
                 query.append([input_cat,input_rows, ''])
-                query.append(data.generate_results(input_cat,input_rows))       # querys results from dataset
+                query.append(toy_data.generate_results(input_cat,input_rows))       # querys results from dataset
                 results.append(query)
 
     csv_data_file.close()

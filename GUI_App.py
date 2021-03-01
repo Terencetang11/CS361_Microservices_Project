@@ -16,6 +16,9 @@ class GUI:
         self.root = root
         self.mainframe = Frame(self.root)
         self.root.title("Life Generator")
+
+        self.toy_data = data.Data()
+
         self.p1 = process
         self.request_queue = request_queue
         self.receive_queue = receive_queue
@@ -28,15 +31,16 @@ class GUI:
         self.root.rowconfigure(0, weight=1)
 
         # display instructions for life generator
-        ttk.Label(self.mainframe, text="Welcome to the Life Generator app!")\
-            .grid(column=2, row=0, columnspan=3, sticky=W)
-        ttk.Label(self.mainframe, text="Instructions: Please enter a toy category and the desired number of results, "
-                                       "and we'll display the top toys for your selection.") \
-            .grid(column=2, row=1, columnspan=3, sticky=W)
+        welcome = "Welcome to the Life Generator app!"
+        instructions = "Instructions: Please enter a toy category and the desired number of results, and " \
+                       "we'll display the top toys for your selection."
+
+        ttk.Label(self.mainframe, text=welcome).grid(column=2, row=0, columnspan=3, sticky=W)
+        ttk.Label(self.mainframe, text=instructions).grid(column=2, row=1, columnspan=3, sticky=W)
 
 
         # define toy categories drop-down
-        self.toy_categories = data.get_toy_categories()
+        self.toy_categories = self.toy_data.get_toy_categories()
 
         self.cat_input = StringVar(self.mainframe)
         self.cat_input.set(self.toy_categories[1]) # default value
@@ -58,7 +62,7 @@ class GUI:
 
 
         # define output display area and builds table using tkinter treeview object
-        self.headers = data.get_data_headers()
+        self.headers = self.toy_data.get_data_headers()
 
         self.data_display = ttk.Treeview(self.mainframe, selectmode="browse", columns=self.headers, show='headings')
         for i in range(len(self.headers)):
@@ -97,12 +101,10 @@ class GUI:
             print(input_content)
             self.request_queue.put(input_content)
 
-            # self.p1.join()  # blocks until content generator finishes writing content
-
             # receives input from content-generator microservice
             content = self.receive_queue.get()
 
-            results = data.generate_results(input_cat, input_rows)
+            results = self.toy_data.generate_results(input_cat, input_rows)
 
             for i in range(len(results)):
                 self.data_display.insert("", "end", values=results[i])
