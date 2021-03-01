@@ -8,11 +8,11 @@
 
 
 import sys
-import GUI_App as gui
-import csv_manager as csv
-import Data_Query as data
+import Life_Generator.GUI_App as gui
+import Life_Generator.csv_manager as csv
+import Life_Generator.Data_Query as data
+import Life_Generator.content_generator_microservice as cg
 import multiprocessing
-import content_generator_microservice as cg
 import random
 
 
