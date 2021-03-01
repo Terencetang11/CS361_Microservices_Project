@@ -1,8 +1,10 @@
 # Author: Terence Tang
 # Project: Life Generator
-# Assignment: Sprint 3
-# Date: 2/18/2021
-# Description:  Methods for managing the reading and writing of CSV files for the Life-Generator application
+# Assignment: Sprint 4
+# Date: 2/28/2021
+# Description:  Life generator application which provides a list of top toys given an input of toy category
+#               and # of desired search results.  Also provides a microservice api for other processes to
+#               use to get a list of toy categories.
 
 
 import sys

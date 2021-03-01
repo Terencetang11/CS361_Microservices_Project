@@ -1,7 +1,7 @@
 # Author: Terence Tang
 # Project: Life Generator
-# Assignment: Sprint 3
-# Date: 2/18/2021
+# Assignment: Sprint 4
+# Date: 2/28/2021
 # Description:  Methods for managing the data query and sorting/filtering algorithm for the life generator application.
 #
 
