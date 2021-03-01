@@ -94,8 +94,11 @@ class GUI:
             input_rows = int(self.rows.get())
             input_cat = str(self.cat_input.get())
 
+            content_request = self.get_input_content(input_cat)
+            print("Requesting data from Content-Generator with the following input: " + str(content_request))
             self.request_queue.put(self.get_input_content(input_cat))           # sends data to content-gen microservice
             content = self.receive_queue.get()                                  # receives input from content-generator
+            print("Content Generated: " + str(content))
             results = self.toy_data.generate_results(input_cat, input_rows)     # toy results from Life Generator
 
             # writes data to data display widget of GUI

@@ -18,7 +18,7 @@ import random
 
 def life_generator_microservice(request, receive):
     """For calls made to the Life Generator microservice, provides a tuple of single word strings of toy categories"""
-    amazon_toy_data = data.Data
+    amazon_toy_data = data.Data()
     categories = amazon_toy_data.get_toy_categories()
     formatted_categories = generate_output_for_content_generator(categories)
 
