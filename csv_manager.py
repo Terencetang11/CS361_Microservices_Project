@@ -5,12 +5,14 @@
 # Description:  Methods for managing the reading and writing of CSV files for the Life-Generator application
 #
 
+
 import csv
 import Data_Query as data
 
-"""Reads CSV File Input and generates desired outputs"""
+
 def read_file_input(file):
-    with open(file, 'r', encoding="utf8") as csv_data_file:  # Opens data input csv file and parses out the inputs
+    """Reads CSV File Input and generates desired outputs"""
+    with open(file, 'r', encoding="utf8") as csv_data_file:
         csv_reader = csv.reader(csv_data_file)
         headers = next(csv_reader)
 
@@ -20,25 +22,21 @@ def read_file_input(file):
             if row[0] == 'toys':                        # checks if top level is toys input
                 input_cat = row[1]                      # gets input category
                 input_rows = int(row[2])                # gets # of desired results
-                query = []
-                query.append([input_cat,input_rows, ''])
-                query.append(toy_data.generate_results(input_cat,input_rows))       # querys results from dataset
+                query = [[input_cat, input_rows, ''], toy_data.generate_results(input_cat, input_rows)]
                 results.append(query)
 
     csv_data_file.close()
-
-    # write output
-    write_csv_output(results)                           # generates output
+    write_csv_output(results)
 
 
-"""Writes CSV Output file given results and query inputs"""
 def write_csv_output(results):
+    """Writes CSV Output file given results and query inputs"""
     with open('output.csv', 'w') as csv_file:
         csvwriter = csv.writer(csv_file, delimiter=',')
 
         # generates and writes required headers for csv output
-        headers = ['input_item_type','input_item_category','input_number_to_generate','content_generator_details','output_item_name',
-                   'output_item_rating', 'output_item_num_reviews']
+        headers = ['input_item_type', 'input_item_category', 'input_number_to_generate', 'content_generator_details',
+                   'output_item_name', 'output_item_rating', 'output_item_num_reviews']
         csvwriter.writerow(headers)
 
         # parses out results and writes the required fields to the csv file
@@ -47,10 +45,7 @@ def write_csv_output(results):
             input_rows = query[0][1]
             content = query[0][2]
             for item in query[1]:
-                line = ['toys',input_cat,input_rows,content]
-                line.append(item[1])
-                line.append(item[7])
-                line.append(item[5])
+                line = ['toys', input_cat, input_rows, content, item[1], item[7], item[5]]
                 csvwriter.writerow(line)
     csv_file.close()
 
@@ -59,4 +54,4 @@ def main():
     pass
 
 
-if __name__ == "__main__":  main()  # allows for normal run procedure if file ran as script.
+if __name__ == "__main__":  main()

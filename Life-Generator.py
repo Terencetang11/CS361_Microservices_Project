@@ -5,7 +5,6 @@
 # Description:  Methods for managing the reading and writing of CSV files for the Life-Generator application
 
 
-
 import sys
 import GUI_App as gui
 import csv_manager as csv
@@ -16,8 +15,24 @@ import random
 
 
 def life_generator_microservice(request, receive):
-    category_list = []
+    """For calls made to the Life Generator microservice, provides a tuple of single word strings of toy categories"""
     categories = data.get_toy_categories()
+    formatted_categories = generate_output_for_content_generator(categories)
+
+    # while there are requests in the request queue, provide a random toy category
+    while True:
+        requested_results = request.get()
+        for i in range(requested_results):
+            num = random.randrange(1, len(formatted_categories))
+            receive.put(formatted_categories[num])
+    return
+
+
+def generate_output_for_content_generator(categories):
+    """Cleans up toy category data into a tuple of single words representing toy categories"""
+    category_list = []
+
+    # removes all ',' and '&' chars from list of toy categories
     for cat in categories:
         results = cat
         results = results.replace(",", "")
@@ -27,12 +42,8 @@ def life_generator_microservice(request, receive):
             results.append(results[0])
         category_list.append(results)
 
-    while True:
-        requested_results = request.get()
-        for i in range(requested_results):
-            num = random.randrange(1, len(category_list))
-            receive.put(category_list[num])
-    return
+    return category_list
+
 
 def main():
     request_list = multiprocessing.Queue()
@@ -54,4 +65,4 @@ def main():
     content_generator.terminate()
 
 
-if __name__ == "__main__":  main()                          # allows for normal run procedure if file ran as script.
+if __name__ == "__main__":  main()

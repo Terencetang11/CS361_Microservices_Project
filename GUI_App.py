@@ -12,6 +12,10 @@ import csv_manager as csv
 
 
 class GUI:
+    """
+    GUI Application for the Life-Generator app.  Provides a gui window with instructions and fields to provide inputs
+    for toy categories and # of desired search results.
+    """
     def __init__(self, root, process, request_queue, receive_queue):
         self.root = root
         self.mainframe = Frame(self.root)
@@ -22,7 +26,6 @@ class GUI:
         self.p1 = process
         self.request_queue = request_queue
         self.receive_queue = receive_queue
-
 
         # define frame parameters and sizing
         self.mainframe = ttk.Frame(root, padding="50 30 50 30")
@@ -38,7 +41,6 @@ class GUI:
         ttk.Label(self.mainframe, text=welcome).grid(column=2, row=0, columnspan=3, sticky=W)
         ttk.Label(self.mainframe, text=instructions).grid(column=2, row=1, columnspan=3, sticky=W)
 
-
         # define toy categories drop-down
         self.toy_categories = self.toy_data.get_toy_categories()
 
@@ -49,17 +51,14 @@ class GUI:
         self.cat_dropdown.grid(column=3, row=2, sticky=(W, E))
         ttk.Label(self.mainframe, text="Enter a Toy Category").grid(column=2, row=2, sticky=E)
 
-
         # define integer input for # of desired records returned
         self.rows = IntVar()
         self.rows_entry = ttk.Entry(self.mainframe, width=10, textvariable=self.rows)
         self.rows_entry.grid(column=3, row=3, sticky=(W, E))
         ttk.Label(self.mainframe, text="Enter # of Results Desired").grid(column=2, row=3, sticky=E)
 
-
         # define search button and it's call to the earch function
         ttk.Button(self.mainframe, text="Search", command=self.search).grid(column=4, row=3, sticky=W)
-
 
         # define output display area and builds table using tkinter treeview object
         self.headers = self.toy_data.get_data_headers()
@@ -89,34 +88,25 @@ class GUI:
         self.cat_dropdown.focus()
         self.root.bind("<Return>", self.search)
 
-
     def search(self, *args):
         try:
             self.data_display.delete(*self.data_display.get_children())
             input_rows = int(self.rows.get())
             input_cat = str(self.cat_input.get())
 
-            # sends data to content-generator microservice
-            input_content = self.get_input_content(input_cat)
-            print(input_content)
-            self.request_queue.put(input_content)
+            self.request_queue.put(self.get_input_content(input_cat))           # sends data to content-gen microservice
+            content = self.receive_queue.get()                                  # receives input from content-generator
+            results = self.toy_data.generate_results(input_cat, input_rows)     # toy results from Life Generator
 
-            # receives input from content-generator microservice
-            content = self.receive_queue.get()
+            # writes data to data display widget of GUI
+            for row in range(len(results)):
+                self.data_display.insert("", "end", values=results[row])
 
-            results = self.toy_data.generate_results(input_cat, input_rows)
-
-            for i in range(len(results)):
-                self.data_display.insert("", "end", values=results[i])
-
-            query = []
-            query.append([input_cat, input_rows, content])
-            query.append(results)
+            # readies results to get written in output csv format
+            query = [[input_cat, input_rows, content], results]
             csv.write_csv_output([query])
 
-            return self.rows.get(), self.cat_input.get()
-
-        except ValueError:
+        except ValueError:  # error handling for input csv files, does not break program if invalid inputs provided
             pass
 
     def get_input_content(self, string):

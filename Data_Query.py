@@ -11,6 +11,10 @@ from operator import itemgetter
 
 
 class Data:
+    """
+    Data object which represents the toy data input provided.  Has methods for getting toy categories, data headers
+    and for searching for top toys given a category input and # of desired toys to return.
+    """
     def __init__(self):
         self.categories = []
         self.headers = []
@@ -22,17 +26,13 @@ class Data:
         self.read_data_csv_file()
 
     def read_data_csv_file(self):
+        """ Opens and reads the data input csv file and moves info to memory for manipulation """
         with open("amazon_co-ecommerce_sample.csv", 'r', encoding="utf8") as csv_data_file:
             csv_reader = csv.reader(csv_data_file)
             self.headers = next(csv_reader)
-            self.category_index = self.headers.index("amazon_category_and_sub_category")
+            self.set_data_indexes()
 
-            self.id_index = self.headers.index("uniq_id")
-            self.reviews_index = self.headers.index("number_of_reviews")
-            self.ratings_index = self.headers.index("average_review_rating")
-            self.category_index = self.headers.index("amazon_category_and_sub_category")
-
-            # scans and notes each distinct toy category in the dataset
+            # scans and notes each distinct toy category in the dataset and appends each row to data
             for row in csv_reader:
                 self.data.append(row)
                 category = row[self.category_index].split(" >")
@@ -40,16 +40,24 @@ class Data:
                     self.categories.append(category[0])
             self.categories.sort()
 
-    """Returns a list of the distinct toy categories available for search"""
+    def set_data_indexes(self):
+        """ Sets indexes for columns used in filtering and sorting """
+        self.category_index = self.headers.index("amazon_category_and_sub_category")
+        self.id_index = self.headers.index("uniq_id")
+        self.reviews_index = self.headers.index("number_of_reviews")
+        self.ratings_index = self.headers.index("average_review_rating")
+        self.category_index = self.headers.index("amazon_category_and_sub_category")
+
     def get_toy_categories(self):
+        """Returns a list of the distinct toy categories available for search"""
         return self.categories
 
-    """Returns the headers for the toy dataset"""
     def get_data_headers(self):
+        """Returns the headers for the toy dataset"""
         return self.headers
 
-    """Returns the results from querying the toy dataset given a category input and # of results desired"""
     def generate_results(self, input_cat, input_rows):
+        """Returns the results from querying the toy dataset given a category input and # of results desired"""
         results = self.data[:]
 
         # filters for all rows which match requested toy category
@@ -61,7 +69,7 @@ class Data:
         return results
 
     def filter_for_toy_category(self, toy_data, input_cat):
-        """ generates an array holding all records that match the right toy category """
+        """ Generates an array holding all records that match the right toy category """
         results = []
         for row in toy_data:
             toy_category = row[self.category_index].split(" >")
@@ -77,6 +85,7 @@ class Data:
         return results
 
     def sort_and_filter_results(self, results, input_rows):
+        """ Sorts and filters the results to show top results based on # of reviews and avg rating """
         # sorts by UID and then by # of reviews
         results.sort(key=itemgetter(self.id_index))
         results.sort(key=itemgetter(self.reviews_index), reverse=True)
@@ -93,6 +102,7 @@ class Data:
         results = results[:input_rows]
 
         return results
+
 
 def main():
     pass
