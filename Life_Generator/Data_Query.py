@@ -27,7 +27,7 @@ class Data:
 
     def read_data_csv_file(self):
         """ Opens and reads the data input csv file and moves info to memory for manipulation """
-        with open("amazon_co-ecommerce_sample.csv", 'r', encoding="utf8") as csv_data_file:
+        with open("Life_Generator/amazon_co-ecommerce_sample.csv", 'r', encoding="utf8") as csv_data_file:
             csv_reader = csv.reader(csv_data_file)
             self.headers = next(csv_reader)
             self.set_data_indexes()
