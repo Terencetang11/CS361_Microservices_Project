@@ -35,11 +35,19 @@ class GUI:
 
         # display instructions for life generator
         welcome = "Welcome to the Life Generator app!"
-        instructions = "Instructions: Please enter a toy category and the desired number of results, and " \
-                       "we'll display the top toys for your selection."
+        instructions = "Instructions: \n" \
+                       "Please select a toy category and enter the desired number of results, and " \
+                       "we'll display the top toys for your selection.\n" \
+                       "For more instructions, please click on the additional details button!"
 
         ttk.Label(self.mainframe, text=welcome).grid(column=2, row=0, columnspan=3, sticky=W)
-        ttk.Label(self.mainframe, text=instructions).grid(column=2, row=1, columnspan=3, sticky=W)
+        ttk.Label(self.mainframe, text=instructions, wraplength=750).grid(column=2, row=1, columnspan=3, sticky=W)
+        self.more_info_label = ttk.Label(self.mainframe, wraplength=750)
+        self.more_info_label.grid(column=2, row=2, columnspan=3, sticky=W)
+
+        # define more info button and it's call to the more info function
+        self.info_btn = ttk.Button(self.mainframe, text="Additional Details", command=self.generate_details)
+        self.info_btn.grid(column=2, row=2, sticky=W)
 
         # define toy categories drop-down
         self.toy_categories = self.toy_data.get_toy_categories()
@@ -48,17 +56,17 @@ class GUI:
         self.cat_input.set(self.toy_categories[1]) # default value
 
         self.cat_dropdown = OptionMenu(self.mainframe, self.cat_input, *self.toy_categories)
-        self.cat_dropdown.grid(column=3, row=2, sticky=(W, E))
-        ttk.Label(self.mainframe, text="Enter a Toy Category").grid(column=2, row=2, sticky=E)
+        self.cat_dropdown.grid(column=3, row=4, sticky=(W, E))
+        ttk.Label(self.mainframe, text="Enter a Toy Category").grid(column=2, row=4, sticky=E)
 
         # define integer input for # of desired records returned
         self.rows = IntVar()
         self.rows_entry = ttk.Entry(self.mainframe, width=10, textvariable=self.rows)
-        self.rows_entry.grid(column=3, row=3, sticky=(W, E))
-        ttk.Label(self.mainframe, text="Enter # of Results Desired").grid(column=2, row=3, sticky=E)
+        self.rows_entry.grid(column=3, row=5, sticky=(W, E))
+        ttk.Label(self.mainframe, text="Enter # of Results Desired").grid(column=2, row=5, sticky=E)
 
-        # define search button and it's call to the earch function
-        ttk.Button(self.mainframe, text="Search", command=self.search).grid(column=4, row=3, sticky=W)
+        # define search button and it's call to the search function
+        ttk.Button(self.mainframe, text="Search", command=self.search).grid(column=4, row=5, sticky=W)
 
         # define output display area and builds table using tkinter treeview object
         self.headers = self.toy_data.get_data_headers()
@@ -68,17 +76,23 @@ class GUI:
             self.data_display.heading(self.headers[i], text=self.headers[i])
             self.data_display.column(i, anchor="center", width=40, minwidth=100)
 
-        self.data_display.grid(row=4, rowspan=10, column=2, columnspan=3, padx=10, pady=3, sticky=NSEW)
+        self.data_display.grid(row=6, rowspan=10, column=2, columnspan=3, padx=10, pady=3, sticky=NSEW)
 
         # define scrollbars for the data display widget
         self.vsb = ttk.Scrollbar(self.mainframe, orient="vertical", command=self.data_display.yview)
-        self.vsb.grid(row=4, column=4, sticky=NE)
+        self.vsb.grid(row=6, column=4, sticky=NE)
 
         self.hsb = ttk.Scrollbar(self.mainframe, orient="horizontal", command=self.data_display.xview)
-        self.hsb.grid(row=14, column=2, sticky=SW)
+        self.hsb.grid(row=16, column=2, sticky=SW)
 
         self.data_display.configure(yscrollcommand=self.vsb.set)
         self.data_display.configure(xscrollcommand=self.hsb.set)
+
+        # define content generator display area for query results
+        cg_title = "*NEW* Content Generator Results - Get an informational paragraph on your search topic:"
+        ttk.Label(self.mainframe, text=cg_title).grid(row=18, column=2, columnspan=3, sticky=W)
+        self.cg_results = ttk.Label(self.mainframe, text='Start a search to get results...')
+        self.cg_results.grid(row=19, column=2, columnspan=3, sticky=W)
 
         # general padding of widgets in mainframe
         for child in self.mainframe.winfo_children():
@@ -105,6 +119,11 @@ class GUI:
             for row in range(len(results)):
                 self.data_display.insert("", "end", values=results[row])
 
+            # destroys and rewrites content generator content to display
+            self.cg_results.destroy()
+            self.cg_results = ttk.Label(self.mainframe, text=content, wraplength=750)
+            self.cg_results.grid(row=17, column=2, columnspan=3, sticky=W)
+
             # readies results to get written in output csv format
             query = [[input_cat, input_rows, content], results]
             csv.write_csv_output([query])
@@ -112,7 +131,28 @@ class GUI:
         except ValueError:  # error handling for input csv files, does not break program if invalid inputs provided
             pass
 
+    def generate_details(self):
+        """ Updates additional_details button to function as a hide_details button and displays details text """
+        self.info_btn.config(text="Hide Details", command=self.hide_details)
+        self.info_btn.grid(column=2, row=3, sticky=W)
+        more_info = "Each search will generate results which will be displayed in the table below as well as " \
+                    "updating a CSV formatted output file named output.csv in this program's local directory.\n\n" \
+                    "This program also provides the advanced ability to enter multiple search inputs at once via " \
+                    "a provided input file during program run-time.  Use of this feature requires knowledge of how" \
+                    " to run python programs via a console or terminal and a formatted input.csv file. \n" \
+                    "Required format for input.csv (with header): input_item_type, input_item_category," \
+                    "input_number_to_generate, where input_item_type=toys." \
+                    "\n"
+        self.more_info_label.config(text=more_info)
+
+    def hide_details(self):
+        """ Updates hide_details button to function as show additional_details button and hides details text """
+        self.info_btn.config(text="Additional Details", command=self.generate_details)
+        self.info_btn.grid(column=2, row=2, sticky=W)
+        self.more_info_label.config(text='')
+
     def get_input_content(self, string):
+        """ Formats string of toy categories to be sent to the content generator microservice."""
         string = string.replace(',', '')
         string = string.replace('&', '')
         string = string.split()[:2]
