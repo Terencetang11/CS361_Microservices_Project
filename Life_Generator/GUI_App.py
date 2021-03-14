@@ -122,7 +122,7 @@ class GUI:
             # destroys and rewrites content generator content to display
             self.cg_results.destroy()
             self.cg_results = ttk.Label(self.mainframe, text=content, wraplength=750)
-            self.cg_results.grid(row=17, column=2, columnspan=3, sticky=W)
+            self.cg_results.grid(row=19, column=2, columnspan=3, sticky=W)
 
             # readies results to get written in output csv format
             query = [[input_cat, input_rows, content], results]
